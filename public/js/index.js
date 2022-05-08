@@ -2,15 +2,22 @@
 import '@babel/polyfill'
 import { displayMap } from './mapbox'
 import { login, logout } from './login'
+import { updateData } from './updateSettings'
+
+// DOM ELEMENTS
+const mapBox = document.getElementById('map')
+const loginForm = document.querySelector('.form--login')
+const logOutBtn = document.querySelector('.nav__el--logout')
+const userDataForm = document.querySelector('.form-user-data')
 
 //DELEGATION
-if (document.getElementById('map')) {
-  const locations = JSON.parse(document.getElementById('map').dataset.locations)
+if (mapBox) {
+  const locations = JSON.parse(mapBox.dataset.locations)
   displayMap(locations)
 }
 
-if (document.querySelector('.form')) {
-  document.querySelector('.form').addEventListener('submit', (e) => {
+if (loginForm) {
+  loginForm.addEventListener('submit', (e) => {
     e.preventDefault()
     const email = document.getElementById('email').value
     const password = document.getElementById('password').value
@@ -18,5 +25,13 @@ if (document.querySelector('.form')) {
   })
 }
 
-if (document.querySelector('.nav__el--logout'))
-  document.querySelector('.nav__el--logout').addEventListener('click', logout)
+if (logOutBtn) logOutBtn.addEventListener('click', logout)
+
+if (userDataForm)
+  userDataForm.addEventListener('submit', (e) => {
+    e.preventDefault()
+    const name = document.getElementById('name').value
+    const email = document.getElementById('email').value
+
+    updateData(name, email)
+  })
