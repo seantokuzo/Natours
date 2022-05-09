@@ -501,6 +501,7 @@ body {
 }
 
 .section-pictures {
+  min-height: 450px;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -520,6 +521,10 @@ body {
   position: relative;
   z-index: 1000;
 }
+/* 
+.picture-box {
+  min-height: fit-content;
+} */
 
 .picture-box__img {
   display: block;
