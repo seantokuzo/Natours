@@ -21,6 +21,9 @@ export const updateSettings = async (data, type) => {
         'success',
         `${type[0].toUpperCase() + type.slice(1)} updated successfully`
       )
+      window.setTimeout(() => {
+        location.assign('/me')
+      }, 1500)
     }
   } catch (err) {
     console.log(err.response.data.message)
