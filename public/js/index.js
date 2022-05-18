@@ -39,7 +39,6 @@ if (userDataForm)
     const form = new FormData()
     form.append('name', document.getElementById('name').value)
     form.append('email', document.getElementById('email').value)
-    console.log(form)
 
     updateSettings(form, 'data')
   })

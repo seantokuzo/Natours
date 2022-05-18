@@ -61,7 +61,7 @@ userSchema.pre('save', async function (next) {
 
   // DELETE PASSWORFCONFIRM FIELD - DO NOT PERSIST TO DATABASE
   this.passwordConfirm = undefined
-  console.log(`It took ${Date.now() - start}ms to encrypt a bitch!`)
+  // console.log(`It took ${Date.now() - start}ms to encrypt a bitch!`)
   next()
 })
 
@@ -104,7 +104,7 @@ userSchema.methods.createPasswordResetToken = function () {
     .update(resetToken)
     .digest('hex')
 
-  console.log({ resetToken }, this.passwordResetToken)
+  // console.log({ resetToken }, this.passwordResetToken)
 
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000
   return resetToken
