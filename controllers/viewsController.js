@@ -112,3 +112,9 @@ exports.getSignupForm = (req, res) => {
     title: 'Create an account'
   })
 }
+
+exports.getSignupConfirm = (req, res) => {
+  res.status(200).render('emailConfirmSent', {
+    title: 'Confirm Email'
+  })
+}

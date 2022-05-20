@@ -15,6 +15,7 @@ router.get('/resetSent', viewsController.resetSent)
 router.get('/resetPassword/:token', viewsController.resetPassword)
 router.get('/me', authController.protect, viewsController.getAccount)
 router.get('/signup', viewsController.getSignupForm)
+router.get('/signupConfirm', viewsController.getSignupConfirm)
 router.get(
   '/my-tours',
   // bookingController.createBookingCheckout,

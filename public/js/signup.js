@@ -5,7 +5,7 @@ export const signup = async (name, email, password, passwordConfirm) => {
   try {
     const res = await axios({
       method: 'POST',
-      url: 'http://localhost:3000/api/v1/users/signup',
+      url: 'http://localhost:3000/api/v1/users/initialSignup',
       data: {
         name,
         email,
@@ -15,9 +15,9 @@ export const signup = async (name, email, password, passwordConfirm) => {
     })
 
     if (res.data.status === 'success') {
-      showAlert('success', 'Account successfully created!')
+      showAlert('success', 'Confirmation request sent. Check your email!')
       window.setTimeout(() => {
-        location.assign('/')
+        location.assign('/signupConfirm')
       }, 1500)
     }
   } catch (err) {

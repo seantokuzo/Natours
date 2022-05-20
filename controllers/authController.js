@@ -6,9 +6,15 @@ const catchAsync = require('../utils/catchAsync')
 const AppError = require('../utils/appError')
 const Email = require('../utils/email')
 
-const signToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN
+const signToken = (id, confirm = false) => {
+  if (!confirm) {
+    return jwt.sign({ id }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN
+    })
+  }
+
+  jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_CONFIRM_EXPIRES_IN
   })
 }
 
@@ -37,8 +43,20 @@ const createSendToken = (user, statusCode, req, res) => {
 
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create(req.body)
-  const url = `${req.protocol}://${req.get('host')}/me`
+
+  // CREATE CONFIRMATION TOKEN
+  const token = signToken(newUser._id)
+
+  const url = `${req.protocol}://${req.get(
+    'host'
+  )}/api/v1/users/confirmSignup/${token}`
   // console.log(url)
+  await new Email(newUser, url).sendEmailConfirm()
+})
+
+exports.confirmSignup = catchAsync(async (req, res, next) => {
+  const user = await User.find
+  const url = `${req.protocol}://${req.get('host')}/me`
   await new Email(newUser, url).sendWelcome()
   createSendToken(newUser, 201, req, res)
 })

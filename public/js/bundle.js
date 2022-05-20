@@ -11367,7 +11367,7 @@ var signup = /*#__PURE__*/function () {
             _context.next = 3;
             return (0, _axios.default)({
               method: 'POST',
-              url: 'http://localhost:3000/api/v1/users/signup',
+              url: 'http://localhost:3000/api/v1/users/initialSignup',
               data: {
                 name: name,
                 email: email,
@@ -11380,9 +11380,9 @@ var signup = /*#__PURE__*/function () {
             res = _context.sent;
 
             if (res.data.status === 'success') {
-              (0, _alerts.showAlert)('success', 'Account successfully created!');
+              (0, _alerts.showAlert)('success', 'Confirmation request sent. Check your email!');
               window.setTimeout(function () {
-                location.assign('/');
+                location.assign('/signupConfirm');
               }, 1500);
             }
 
@@ -12045,7 +12045,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51862" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52589" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
