@@ -6,13 +6,17 @@ import { updateSettings } from './updateSettings'
 import { signup } from './signup'
 import { bookTour } from './stripe'
 import { showAlert } from './alerts'
+import { forgotPassword } from './forgotPassword'
+import { resetPassword } from './resetPassword'
 
 // DOM ELEMENTS
 const mapBox = document.getElementById('map')
 const loginForm = document.querySelector('.form--login')
+const forgotPasswordForm = document.querySelector('.form--forgotpass')
 const logOutBtn = document.querySelector('.nav__el--logout')
 const userDataForm = document.querySelector('.form-user-data')
 const userPasswordForm = document.querySelector('.form-user-password')
+const passwordResetForm = document.querySelector('.form--reset-password')
 const signupForm = document.querySelector('.form--signup')
 const userPhotoUpload = document.querySelector('.form__upload')
 const bookBtn = document.getElementById('book-tour')
@@ -29,6 +33,31 @@ if (loginForm) {
     const email = document.getElementById('email').value
     const password = document.getElementById('password').value
     login(email, password)
+  })
+}
+
+if (forgotPasswordForm) {
+  forgotPasswordForm.addEventListener('submit', (e) => {
+    e.preventDefault()
+    const sendLinkBtn = document.getElementById('send-reset-btn')
+    sendLinkBtn.setAttribute('disabled', true)
+    sendLinkBtn.textContent = 'Sending...'
+    const email = document.getElementById('email').value
+    forgotPassword(email)
+  })
+}
+
+if (passwordResetForm) {
+  passwordResetForm.addEventListener('submit', (e) => {
+    e.preventDefault()
+    const password = document.getElementById('reset-password').value
+    const passwordConfirm = document.getElementById(
+      'reset-password-confirm'
+    ).value
+    const submitBtn = document.getElementById('reset-password-btn')
+    const { token } = submitBtn.dataset
+
+    resetPassword(password, passwordConfirm, token)
   })
 }
 
