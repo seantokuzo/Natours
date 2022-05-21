@@ -6,20 +6,20 @@ const catchAsync = require('../utils/catchAsync')
 const AppError = require('../utils/appError')
 const Email = require('../utils/email')
 
-const signToken = (id, confirm = false) => {
-  if (!confirm) {
+const signToken = (id, confirmed) => {
+  if (confirmed) {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN
     })
   }
 
-  jwt.sign({ id }, process.env.JWT_SECRET, {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_CONFIRM_EXPIRES_IN
   })
 }
 
 const createSendToken = (user, statusCode, req, res) => {
-  const token = signToken(user._id)
+  const token = signToken(user._id, true)
 
   res.cookie('jwt', token, {
     expires: new Date(
@@ -42,23 +42,82 @@ const createSendToken = (user, statusCode, req, res) => {
 }
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const newUser = await User.create(req.body)
+  // CHECK IF USER EXISTS WITH THAT EMAIL
+  const user = await User.findOne({ email: req.body.email }).select(
+    '+confirmed'
+  )
+
+  if (user && user.confirmed) {
+    return next(new AppError('That email is already registered to an account'))
+  }
+
+  if (user && !user.confirmed && user.confirmationExpires > Date.now()) {
+    return next(
+      new AppError(
+        'Confirmation has already been sent. Please check your email'
+      )
+    )
+  }
+
+  if (user && !user.confirmed && user.confirmationExpires < Date.now()) {
+    const deletedUser = await User.deleteOne({ email: req.body.email })
+  }
+
+  const newUser = await await User.create(req.body)
 
   // CREATE CONFIRMATION TOKEN
-  const token = signToken(newUser._id)
+  const token = signToken(newUser._id, false)
 
+  // SAVE TOKEN AND EXPIRATION TO USER
+  newUser.confirmationExpires = Date.now() + 24 * 60 * 60 * 1000
+  await newUser.save({ validateBeforeSave: false })
+
+  // CREATE URL FOR BTN IN EMAIL - TOKEN AS PARAM
   const url = `${req.protocol}://${req.get(
     'host'
   )}/api/v1/users/confirmSignup/${token}`
   // console.log(url)
-  await new Email(newUser, url).sendEmailConfirm()
+
+  // SEND CONFIRMATION EMAIL
+  try {
+    await new Email(newUser, url).sendEmailConfirm()
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Token sent by email'
+    })
+  } catch (err) {
+    console.log(err)
+    return next(
+      new AppError(
+        'There was an error sending the confirmation email, please try again later',
+        500
+      )
+    )
+  }
 })
 
 exports.confirmSignup = catchAsync(async (req, res, next) => {
-  const user = await User.find
+  const token = req.params.token
+
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET)
+
+  const user = await User.findById(decoded.id).select('+confirmed')
+
+  if (!user) {
+    return next(
+      new AppError('The use belonging to the token does not exist', 401)
+    )
+  }
+  if (user.confirmed) {
+    return next(new AppError('This account has already been verified', 400))
+  }
+  user.confirmed = true
+  await user.save({ validateBeforeSave: false })
+
   const url = `${req.protocol}://${req.get('host')}/me`
-  await new Email(newUser, url).sendWelcome()
-  createSendToken(newUser, 201, req, res)
+  await new Email(user, url).sendWelcome()
+  createSendToken(user, 201, req, res)
 })
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -69,7 +128,15 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Please provide email and password!', 400))
   }
   // 2) Check if user exists && password is correct
-  const user = await User.findOne({ email }).select('+password')
+  const user = await User.findOne({ email }).select(['+password', '+confirmed'])
+
+  console.log(user.confirmed)
+
+  if (!user.confirmed) {
+    return next(
+      new AppError('Please confirm your email address before logging in')
+    )
+  }
 
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError('Incorrect email or password', 401))
@@ -77,7 +144,7 @@ exports.login = catchAsync(async (req, res, next) => {
 
   // 3) All Good - send the JWT to client
   createSendToken(user, 200, req, res)
-  const token = signToken(user._id)
+  const token = signToken(user._id, true)
   res.status(200).json({
     status: 'success',
     token
@@ -114,10 +181,17 @@ exports.protect = catchAsync(async (req, res, next) => {
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET)
 
   // 3) Check if user still exists
-  const currentUser = await User.findById(decoded.id)
+  const currentUser = await User.findById(decoded.id).select('+confirmed')
   if (!currentUser) {
     return next(
       new AppError('The user belonging to this token no longer exists', 401)
+    )
+  }
+
+  // 3.5) CHECK THAT USER HAS CONFIRMED THEIR EMAIL
+  if (!currentUser.confirmed) {
+    return next(
+      new AppError('You need to confirm your email address before continuing')
     )
   }
 

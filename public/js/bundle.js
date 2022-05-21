@@ -11367,7 +11367,7 @@ var signup = /*#__PURE__*/function () {
             _context.next = 3;
             return (0, _axios.default)({
               method: 'POST',
-              url: 'http://localhost:3000/api/v1/users/initialSignup',
+              url: 'http://localhost:3000/api/v1/users/signup',
               data: {
                 name: name,
                 email: email,
@@ -11378,6 +11378,7 @@ var signup = /*#__PURE__*/function () {
 
           case 3:
             res = _context.sent;
+            console.log(res.data.status);
 
             if (res.data.status === 'success') {
               (0, _alerts.showAlert)('success', 'Confirmation request sent. Check your email!');
@@ -11386,20 +11387,20 @@ var signup = /*#__PURE__*/function () {
               }, 1500);
             }
 
-            _context.next = 10;
+            _context.next = 11;
             break;
 
-          case 7:
-            _context.prev = 7;
+          case 8:
+            _context.prev = 8;
             _context.t0 = _context["catch"](0);
             (0, _alerts.showAlert)('error', _context.t0.response.data.message);
 
-          case 10:
+          case 11:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[0, 7]]);
+    }, _callee, null, [[0, 8]]);
   }));
 
   return function signup(_x, _x2, _x3, _x4) {
@@ -11989,6 +11990,8 @@ if (userPasswordForm) userPasswordForm.addEventListener('submit', /*#__PURE__*/f
 if (signupForm) {
   signupForm.addEventListener('submit', function (e) {
     e.preventDefault();
+    var signupBtn = document.getElementById('signup-btn');
+    signupBtn.setAttribute('disabled', true);
     var name = document.getElementById('signup-name').value;
     var email = document.getElementById('signup-email').value;
     var password = document.getElementById('signup-password').value;
@@ -12045,7 +12048,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52589" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55322" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

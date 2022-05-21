@@ -95,6 +95,8 @@ if (userPasswordForm)
 if (signupForm) {
   signupForm.addEventListener('submit', (e) => {
     e.preventDefault()
+    const signupBtn = document.getElementById('signup-btn')
+    signupBtn.setAttribute('disabled', true)
     const name = document.getElementById('signup-name').value
     const email = document.getElementById('signup-email').value
     const password = document.getElementById('signup-password').value
