@@ -63,7 +63,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     const deletedUser = await User.deleteOne({ email: req.body.email })
   }
 
-  const newUser = await await User.create(req.body)
+  const newUser = await User.create(req.body)
 
   // CREATE CONFIRMATION TOKEN
   const token = signToken(newUser._id, false)
